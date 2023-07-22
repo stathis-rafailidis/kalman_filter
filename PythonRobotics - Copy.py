@@ -178,11 +178,11 @@ def main():
     #df = pd.read_excel('Desktop/book1.xlsx',  sheet_name='OdomCoords')
     #File_data = pd.read_excel('Desktop/Data_for_Kalman_Filter.xlsx',  sheet_name='Sheet1')
     File_data = pd.read_excel(r'C:\Users\stathis\OneDrive\Διπλωματική\data from kalman scipts\17_7_23\kalman_data_17_7_23.xlsx',  sheet_name="OdomCoords")
-    #print(da) C:\Users\stathis\OneDrive\Διπλωματική\data from kalman scipts\17_7_23
+
     #File_data = np.loadtxt("Desktop/OdomCoords.txt", delimiter= "," , dtype=float)
 
     File_data = np.asarray(File_data)
-    #print((File_data[0][0]), File_data[0][1])
+
     #arr = np.array([[1, 2, 3], [4, 5, 6]])
     temp = np.array([[File_data[0][0]], [File_data[0][1]]])
     temp2 = temp.transpose()
@@ -191,54 +191,36 @@ def main():
 
 
     # history
-    hxEst = xEst
-    hxTrue = xTrue
-    hxDR = xTrue
-    hz = np.zeros((1, 2))
+    # hxEst = xEst
+    # hxTrue = xTrue
+    # hxDR = xTrue
+    # hz = np.zeros((1, 2))
 
     while SIM_TIME >= time:
         time += DT
         u = calc_input()
 
         xTrue, z, xDR, ud = observation(xTrue, xDR, u)
-        
+        print(u)
         # f = open("xTrue.txt", "a")
         # f.write(str(xTrue[0]) + ", " + str(xTrue[1]) + "\n")
         # f.close()
         
-        #print(type(z))
+
         #xEst, PEst = ekf_estimation(xEst, PEst, temp2, u)
         # to kato einai to arxiko
-        xEst, PEst = ekf_estimation(xEst, PEst, temp2, ud)
+        xEst, PEst = ekf_estimation(xEst, PEst, temp2, u)
         i = i + 1
         temp = np.array([[File_data[i][0]], [File_data[i][1]]])
         temp2 = temp.transpose()
-        print(xEst.shape)
         f = open("xEst.txt", "a")
         f.write(str(xEst[0]).strip('] [') + " " + str(xEst[1]).strip('] [') + "\n")
         f.close()
 
 
 
-        # store data history
-        hxEst = np.hstack((hxEst, xEst))
-        hxDR = np.hstack((hxDR, xDR))
-        hxTrue = np.hstack((hxTrue, xTrue))
-        hz = np.vstack((hz, z))
-
-        if show_animation:
-            plt.cla()
-            plt.plot(hz[:, 0], hz[:, 1], ".g")
-            plt.plot(hxTrue[0, :].flatten(),
-                     hxTrue[1, :].flatten(), "-b")
-            plt.plot(hxDR[0, :].flatten(),
-                     hxDR[1, :].flatten(), "-k")
-            plt.plot(hxEst[0, :].flatten(),
-                     hxEst[1, :].flatten(), "-r")
-            plot_covariance_ellipse(xEst, PEst)
-            plt.axis("equal")
-            plt.grid(True)
-            plt.pause(0.001)
+        
+        
 
 
 if __name__ == '__main__':
