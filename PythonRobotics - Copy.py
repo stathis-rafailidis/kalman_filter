@@ -13,12 +13,12 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 # Estimation parameter of EKF
-Q = np.diag([0.001, 0.001])**2  # Observation x,y position covariance
-R = np.diag([0.001, 0.001, np.deg2rad(1.0), 1.0])**2  # predict state covariance
+Q = np.diag([0.1, 0.1])**2  # Observation x,y position covariance
+R = np.diag([0.1, 0.1, np.deg2rad(0), 0])**2  # predict state covariance
 
 #  Simulation parameter
-Qsim = np.diag([0.5, 0.5])**2
-Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
+Qsim = np.diag([0.1, 0.1])**2
+Rsim = np.diag([0.1, np.deg2rad(0)])**2
 
 DT = 0.1  # time tick [s]
 SIM_TIME = 500.0  # simulation time [s]
@@ -27,8 +27,8 @@ show_animation = False
 
 
 def calc_input():
-    v = 1.0  # [m/s]
-    yawrate = 0.01  # [rad/s]
+    v = 2.0  # [m/s]
+    yawrate = 0.0  # [rad/s]
     u = np.array([[v, yawrate]]).T
     return u
 
@@ -175,9 +175,10 @@ def main():
 
 
     #My Code#
-    #df = pd.read_excel('Desktop/book1.xlsx',  sheet_name='OdomCoords')
-    #File_data = pd.read_excel('Desktop/Data_for_Kalman_Filter.xlsx',  sheet_name='Sheet1')
-    File_data = pd.read_excel(r'C:\Users\stathis\OneDrive\Διπλωματική\data from kalman scipts\17_7_23\kalman_data_17_7_23.xlsx',  sheet_name="OdomCoords")
+
+    #File_data = pd.read_excel(r'C:\Users\stathis\OneDrive\Διπλωματική\data from kalman scipts\17_7_23\kalman_data_17_7_23.xlsx',  sheet_name="OdomCoords")
+
+    File_data = pd.read_excel(r'C:\Users\stathis\OneDrive\Διπλωματική\data from sim.xlsx',  sheet_name="OdomCoords")
 
     #File_data = np.loadtxt("Desktop/OdomCoords.txt", delimiter= "," , dtype=float)
 
