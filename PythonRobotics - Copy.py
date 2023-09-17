@@ -8,49 +8,37 @@ author: Atsushi Sakai (@Atsushi_twi)
 
 import numpy as np
 import math
-import matplotlib.pyplot as plt
 
 import pandas as pd
 
 # Estimation parameter of EKF
-Q = np.diag([0.001, 0.001])**2  # Observation x,y position covariance
-R = np.diag([0.001, 0.001, np.deg2rad(1.0), 1.0])**2  # predict state covariance
+<<<<<<< HEAD
+Q = np.diag([0.1, 0.1])**2  # Observation x,y position covariance
+R = np.diag([0.1, 0.1, np.deg2rad(0), 0])**2  # predict state covariance
 
 #  Simulation parameter
-Qsim = np.diag([0.5, 0.5])**2
-Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
+Qsim = np.diag([0.1, 0.1])**2
+Rsim = np.diag([0.1, np.deg2rad(0)])**2
+=======
+Q = np.diag([1, 1])**2  # Observation x,y position covariance
+R = np.diag([1, 1, np.deg2rad(10.0), 10.0])**2  # predict state covariance
+
+#  Simulation parameter
+# Qsim = np.diag([0.5, 0.5])**2
+# Rsim = np.diag([1.0, np.deg2rad(30.0)])**2
+>>>>>>> 3f20edd4df78bb3dd8796401583a68f0c2bf2b76
 
 DT = 0.1  # time tick [s]
-SIM_TIME = 500.0  # simulation time [s]
+SIM_TIME = 114  # simulation time [s]
 
 show_animation = False
 
 
 def calc_input():
-    v = 1.0  # [m/s]
-    yawrate = 0.01  # [rad/s]
+    v = 2.0  # [m/s]
+    yawrate = 0.0  # [rad/s]
     u = np.array([[v, yawrate]]).T
     return u
-
-
-def observation(xTrue, xd, u):
-
-    xTrue = motion_model(xTrue, u)
-
-    # add noise to gps x-y
-    zx = xTrue[0, 0] + np.random.randn() * Qsim[0, 0]
-    zy = xTrue[1, 0] + np.random.randn() * Qsim[1, 1]
-    z = np.array([[zx, zy]])
-
-    # add noise to input
-    ud1 = u[0, 0] + np.random.randn() * Rsim[0, 0]
-    ud2 = u[1, 0] + np.random.randn() * Rsim[1, 1]
-    ud = np.array([[ud1, ud2]]).T
-
-    xd = motion_model(xd, ud)
-
-    return xTrue, z, xd, ud
-
 
 def motion_model(x, u):
 
@@ -135,32 +123,6 @@ def ekf_estimation(xEst, PEst, z, u):
 
     return xEst, PEst
 
-
-def plot_covariance_ellipse(xEst, PEst):
-    Pxy = PEst[0:2, 0:2]
-    eigval, eigvec = np.linalg.eig(Pxy)
-
-    if eigval[0] >= eigval[1]:
-        bigind = 0
-        smallind = 1
-    else:
-        bigind = 1
-        smallind = 0
-
-    t = np.arange(0, 2 * math.pi + 0.1, 0.1)
-    a = math.sqrt(eigval[bigind])
-    b = math.sqrt(eigval[smallind])
-    x = [a * math.cos(it) for it in t]
-    y = [b * math.sin(it) for it in t]
-    angle = math.atan2(eigvec[bigind, 1], eigvec[bigind, 0])
-    R = np.array([[math.cos(angle), math.sin(angle)],
-                  [-math.sin(angle), math.cos(angle)]])
-    fx = R.dot(np.array([[x, y]]))
-    px = np.array(fx[0, :] + xEst[0, 0]).flatten()
-    py = np.array(fx[1, :] + xEst[1, 0]).flatten()
-    plt.plot(px, py, "--r")
-
-
 def main():
     print(__file__ + " start!!")
 
@@ -168,78 +130,42 @@ def main():
 
     # State Vector [x y yaw v]'
     xEst = np.zeros((4, 1))
-    xTrue = np.zeros((4, 1))
     PEst = np.eye(4)
 
-    xDR = np.zeros((4, 1))  # Dead reckoning
-
-
     #My Code#
-    #df = pd.read_excel('Desktop/book1.xlsx',  sheet_name='OdomCoords')
-    #File_data = pd.read_excel('Desktop/Data_for_Kalman_Filter.xlsx',  sheet_name='Sheet1')
-    File_data = pd.read_excel(r'C:\Users\stathis\OneDrive\Διπλωματική\data from kalman scipts\17_7_23\kalman_data_17_7_23.xlsx',  sheet_name="OdomCoords")
-    #print(da) C:\Users\stathis\OneDrive\Διπλωματική\data from kalman scipts\17_7_23
+<<<<<<< HEAD
+
+    #File_data = pd.read_excel(r'C:\Users\stathis\OneDrive\Διπλωματική\data from kalman scipts\17_7_23\kalman_data_17_7_23.xlsx',  sheet_name="OdomCoords")
+
+    File_data = pd.read_excel(r'C:\Users\stathis\OneDrive\Διπλωματική\data from sim.xlsx',  sheet_name="OdomCoords")
+
     #File_data = np.loadtxt("Desktop/OdomCoords.txt", delimiter= "," , dtype=float)
 
+=======
+    File_data = pd.read_excel(r'C:\Users\stath\OneDrive\Διπλωματική\data from kalman scipts\17_7_23\kalman_data_17_7_23.xlsx',  sheet_name="OdomCoords")
+>>>>>>> 3f20edd4df78bb3dd8796401583a68f0c2bf2b76
     File_data = np.asarray(File_data)
-    #print((File_data[0][0]), File_data[0][1])
-    #arr = np.array([[1, 2, 3], [4, 5, 6]])
+
     temp = np.array([[File_data[0][0]], [File_data[0][1]]])
     temp2 = temp.transpose()
     i = 0
-    #  #
-
 
     # history
-    hxEst = xEst
-    hxTrue = xTrue
-    hxDR = xTrue
-    hz = np.zeros((1, 2))
+    # hxEst = xEst
+    # hxTrue = xTrue
+    # hxDR = xTrue
+    # hz = np.zeros((1, 2))
 
     while SIM_TIME >= time:
         time += DT
         u = calc_input()
-
-        xTrue, z, xDR, ud = observation(xTrue, xDR, u)
-        
-        # f = open("xTrue.txt", "a")
-        # f.write(str(xTrue[0]) + ", " + str(xTrue[1]) + "\n")
-        # f.close()
-        
-        #print(type(z))
-        #xEst, PEst = ekf_estimation(xEst, PEst, temp2, u)
-        # to kato einai to arxiko
-        xEst, PEst = ekf_estimation(xEst, PEst, temp2, ud)
+        xEst, PEst = ekf_estimation(xEst, PEst, temp2, u)
         i = i + 1
         temp = np.array([[File_data[i][0]], [File_data[i][1]]])
         temp2 = temp.transpose()
-        print(xEst.shape)
         f = open("xEst.txt", "a")
         f.write(str(xEst[0]).strip('] [') + " " + str(xEst[1]).strip('] [') + "\n")
         f.close()
-
-
-
-        # store data history
-        hxEst = np.hstack((hxEst, xEst))
-        hxDR = np.hstack((hxDR, xDR))
-        hxTrue = np.hstack((hxTrue, xTrue))
-        hz = np.vstack((hz, z))
-
-        if show_animation:
-            plt.cla()
-            plt.plot(hz[:, 0], hz[:, 1], ".g")
-            plt.plot(hxTrue[0, :].flatten(),
-                     hxTrue[1, :].flatten(), "-b")
-            plt.plot(hxDR[0, :].flatten(),
-                     hxDR[1, :].flatten(), "-k")
-            plt.plot(hxEst[0, :].flatten(),
-                     hxEst[1, :].flatten(), "-r")
-            plot_covariance_ellipse(xEst, PEst)
-            plt.axis("equal")
-            plt.grid(True)
-            plt.pause(0.001)
-
 
 if __name__ == '__main__':
     main()
