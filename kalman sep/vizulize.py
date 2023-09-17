@@ -6,6 +6,7 @@ from RobotEKF import RobotEKF
 from numpy.random import randn
 from numpy import array
 from math import atan2
+import pandas as pd
 
 dt = 1.0
 
@@ -81,8 +82,16 @@ def run_localization(landmarks, std_vel, std_steer,
     plt.scatter(landmarks[:, 0], landmarks[:, 1],
                 marker='s', s=60)
     track = []
-    for i in range(200):
-        sim_pos = ekf.move(sim_pos, u, dt/10.) # simulate robot
+
+    i = 0
+
+    File_data = pd.read_excel(r'C:\Users\stathis\Desktop\kalman_data_17_7_23.xlsx',  sheet_name="Sheet2")
+    File_data = np.asarray(File_data)
+    #temp = np.array([[File_data[i][0]], [File_data[i][1]]],[0])
+    for i in range(100):
+        #sim_pos = ekf.move(sim_pos, u, dt/10.) # simulate robot
+        sim_pos = np.array([[File_data[i][0]], [File_data[i][1]], [File_data[i][1]]]) # simulate robot
+        #print(sim_pos)
         track.append(sim_pos)
 
         if i % step == 0:

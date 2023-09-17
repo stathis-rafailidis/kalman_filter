@@ -4,10 +4,17 @@ import sympy
 from sympy import symbols, Matrix
 from math import sqrt, tan, cos, sin, atan2
 import numpy as np
+import pandas as pd
 
 
 
 class RobotEKF(EKF):
+
+    i = 0
+    File_data = pd.read_excel(r'C:\Users\stathis\Desktop\kalman_data_17_7_23.xlsx',  sheet_name="Sheet2")
+    File_data = np.asarray(File_data)
+    #temp = np.array([[File_data[0][0]], [File_data[0][1]]])
+
     def __init__(self, dt, wheelbase, std_vel, std_steer):
         EKF.__init__(self, 3, 2, 2)
         self.dt = dt
@@ -36,7 +43,9 @@ class RobotEKF(EKF):
         self.v, self.a, self.theta = v, a, theta
 
     def predict(self, u):
-        self.x = self.move(self.x, u, self.dt)
+        #self.x = self.move(self.x, u, self.dt)        
+        self.x = (self.move_2(self.i, self.File_data))
+
         self.subs[self.x_x] = self.x[0, 0]
         self.subs[self.x_y] = self.x[1, 0]
 
@@ -55,8 +64,8 @@ class RobotEKF(EKF):
 
     def move(self, x, u, dt):
         hdg = x[2, 0]
-        print(f"this is x: {x}")
-        print(f"this is hdg: {hdg}")
+        # print(f"this is x: {x}")
+        # print(f"this is hdg: {hdg}")
         vel = u[0]
         steering_angle = u[1]
         dist = vel * dt
@@ -72,4 +81,13 @@ class RobotEKF(EKF):
             dx = np.array([[dist*cos(hdg)], 
                            [dist*sin(hdg)], 
                            [0]])
+        #print(x.shape)
+        # File_data = pd.read_excel(r'C:\Users\stathis\Desktop\kalman_data_17_7_23.xlsx',  sheet_name="Sheet2")
+        # File_data = np.asarray(File_data)
+        # temp = np.array([[File_data[0][0]], [File_data[0][1]]])
+        #temp2 = temp.transpose()
         return x + dx
+    
+    def move_2(self, i, File_data):
+        temp = np.array([[File_data[i][0]], [File_data[i][1]], [File_data[i][1]]] )
+        return temp
